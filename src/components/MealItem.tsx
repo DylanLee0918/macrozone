@@ -1,7 +1,7 @@
 import { deleteMeal } from "@/storage/meals";
 import { colors } from "@/styles/global";
 import * as Haptics from "expo-haptics";
-import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type MealItemProps = {
     id: string;
@@ -13,6 +13,31 @@ type MealItemProps = {
     onDelete: () => void;
 };
 
+const MACRO_BADGES = [
+    { key: "calories", label: "calorie", color: "#ff6b6b", bg: "#ff6b6b22" },
+    { key: "protein", label: "Protein", color: "#4ecdc4", bg: "#4ecdc422" },
+    { key: "carbs", label: "Carbs", color: "#ffd93d", bg: "#ffd93d22" },
+    { key: "fat", label: "Fats", color: "#6bcb77", bg: "#6bcb7722" },
+] as const;
+
+type MacroBadgeProps = {
+    value: number;
+    label: string;
+    color: string;
+    bg: string;
+};
+
+function MacroBadge({ value, label, color, bg }: MacroBadgeProps) {
+    return (
+        <View style={[styles.badge, { backgroundColor: bg }]}>
+            <Text style={[styles.badgeText, { color }]}>
+                {value}
+                {label === "calorie" ? "" : "g"} {label}
+            </Text>
+        </View>
+    );
+}
+
 export default function MealItem({
     id,
     name,
@@ -22,6 +47,8 @@ export default function MealItem({
     fat,
     onDelete,
 }: MealItemProps) {
+    const macroValues = { calories, protein, carbs, fat };
+
     const handleLongPress = () => {
         Alert.alert(
             "Delete Meal",
@@ -49,9 +76,17 @@ export default function MealItem({
             onLongPress={handleLongPress}
         >
             <Text style={styles.name}>{name}</Text>
-            <Text style={styles.macros}>
-                {calories} cal • {protein}g P • {carbs}g C • {fat}g F
-            </Text>
+            <View style={styles.badgeRow}>
+                {MACRO_BADGES.map(({ key, label, color, bg }) => (
+                    <MacroBadge
+                        key={key}
+                        value={macroValues[key]}
+                        label={label}
+                        color={color}
+                        bg={bg}
+                    />
+                ))}
+            </View>
         </TouchableOpacity>
     );
 }
@@ -67,10 +102,20 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "600",
         color: colors.text,
+        marginBottom: 10,
     },
-    macros: {
-        fontSize: 13,
-        color: colors.textSecondary,
-        marginTop: 4,
+    badgeRow: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 6,
+    },
+    badge: {
+        borderRadius: 6,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+    },
+    badgeText: {
+        fontSize: 12,
+        fontWeight: "600",
     },
 });
