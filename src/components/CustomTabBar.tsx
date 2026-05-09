@@ -29,6 +29,7 @@ export default function CustomTabBar({
 }: BottomTabBarProps) {
     const insets = useSafeAreaInsets();
 
+    console.log(state.routes);
     const pillRoutes = state.routes.filter((r) => PILL_ROUTES.includes(r.name));
     const fabRoute = state.routes.find((r) => r.name === "add-meal");
 
