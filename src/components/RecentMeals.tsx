@@ -10,7 +10,7 @@ type RecentMealsProps = {
 
 export default function RecentMeals({ meals, onDelete }: RecentMealsProps) {
     return (
-        <View style={{ marginTop: 30 }}>
+        <View>
             <Text style={globalStyles.sectionTitle}>Recent Meals</Text>
             {meals.length === 0 ? (
                 <Text style={globalStyles.empty}>No meals logged yet.</Text>

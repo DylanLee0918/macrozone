@@ -1,23 +1,19 @@
-import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
 
-Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldShowBanner: true,
-        shouldShowList: true,
-        shouldPlaySound: false,
-        shouldSetBadge: false,
-    }),
-});
+const isExpoGo = Constants.executionEnvironment === "storeClient";
 
 export const requestPermissions = async (): Promise<boolean> => {
+    console.log(isExpoGo);
+    if (isExpoGo) return true;
+    const Notifications = await import("expo-notifications");
     const { status } = await Notifications.requestPermissionsAsync();
     return status === "granted";
 };
 
 export const scheduleMealReminders = async () => {
+    if (isExpoGo) return;
+    const Notifications = await import("expo-notifications");
     await Notifications.cancelAllScheduledNotificationsAsync();
-
     await Notifications.scheduleNotificationAsync({
         content: {
             title: "MacroZone",
@@ -29,12 +25,8 @@ export const scheduleMealReminders = async () => {
             minute: 0,
         },
     });
-
     await Notifications.scheduleNotificationAsync({
-        content: {
-            title: "MacroZone",
-            body: "Time to log your dinner!",
-        },
+        content: { title: "MacroZone", body: "Time to log your dinner!" },
         trigger: {
             type: Notifications.SchedulableTriggerInputTypes.DAILY,
             hour: 18,
@@ -44,5 +36,7 @@ export const scheduleMealReminders = async () => {
 };
 
 export const cancelMealReminders = async () => {
+    if (isExpoGo) return;
+    const Notifications = await import("expo-notifications");
     await Notifications.cancelAllScheduledNotificationsAsync();
 };
